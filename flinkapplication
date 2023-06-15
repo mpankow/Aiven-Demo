@@ -1,0 +1,35 @@
+#create source table
+
+CREATE TABLE source_table (
+    id STRING,
+    stock_name STRING,
+    stock_value DECIMAL(12,9),
+    event_time BIGINT,
+    iso_date STRING
+) WITH (
+    'connector' = 'kafka',
+    'properties.bootstrap.servers' = '',
+    'scan.startup.mode' = 'earliest-offset',
+    'topic' = 'stock-data4',
+    'value.format' = 'json'
+)
+
+#create sink table
+CREATE TABLE evens (
+    id STRING,
+    stock_name STRING,
+    stock_value DECIMAL(12,9),
+    event_time BIGINT,
+    iso_date STRING
+) WITH (
+    'connector' = 'kafka',
+    'properties.bootstrap.servers' = '',
+    'scan.startup.mode' = 'earliest-offset',
+    'topic' = 'evens',
+    'value.format' = 'json'
+)
+
+#create flink app
+insert into evens
+select * from source_table
+where event_time % 2 = 0;
